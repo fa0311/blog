@@ -1,4 +1,5 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "markdown.preview.breaks": true
+  "markdown.preview.breaks": true,
+  "vscode-office.pasterImgPath": "../images/${fileName}/${now}.png"
 }
