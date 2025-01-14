@@ -1,0 +1,84 @@
+---
+import twemoji from "@twemoji/api";
+
+interface Props {
+  title: string;
+  emoji?: string;
+  slug: string;
+}
+
+const { title, emoji, slug } = Astro.props;
+---
+
+<div class="article-item">
+  <a href={`/articles/${slug}`}>
+    <article>
+      <div class="article-left">
+        {
+          emoji && (
+            <div
+              class="article-emoji"
+              set:html={twemoji.parse(emoji, { folder: "svg", ext: ".svg" })}
+            />
+          )
+        }
+      </div>
+      <div class="article-right">
+        <h2 class="article-title">{title}</h2>
+      </div>
+    </article>
+  </a>
+</div>
+
+<style>
+  article {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .article-item {
+    width: 47%;
+  }
+
+  @media (max-width: 768px) {
+    .article-item {
+      width: 100%;
+    }
+  }
+
+  .article-left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 92px;
+    height: 92px;
+    border-radius: 14px;
+    background-color: #ffffff;
+  }
+
+  .article-right {
+    width: calc(100% - 108px);
+    margin: 0.83em 0;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+  }
+
+  .article-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-wrap: wrap;
+    display: -webkit-box;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .article-emoji {
+    width: 42px;
+    height: 42px;
+  }
+</style>

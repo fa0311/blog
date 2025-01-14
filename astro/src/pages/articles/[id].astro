@@ -1,0 +1,79 @@
+---
+import twemoji from "@twemoji/api";
+import Path from "node:path";
+import "zenn-content-css";
+import Topics from "../../components/Topics.astro";
+import Zenn from "../../components/Zenn.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getArticleList, markdownToHtmlNormalized } from "../../lib/zenn";
+
+export const getStaticPaths = async () => {
+  const articles = await getArticleList();
+
+  return articles.map((article) => {
+    const slug = Path.basename(article.file, ".md");
+    const html = markdownToHtmlNormalized(article.rawContent());
+
+    return {
+      params: { id: slug },
+      props: {
+        html: html.contents(),
+        title: article.frontmatter.title,
+        emoji: article.frontmatter.emoji,
+        topics: article.frontmatter.topics,
+        type: article.frontmatter.type,
+      },
+    };
+  });
+};
+
+const { html, title, emoji, topics, type } = Astro.props;
+---
+
+<Layout>
+  <header>
+    {
+      emoji && (
+        <div class="header-emoji" set:html={twemoji.parse(emoji, { folder: "svg", ext: ".svg" })} />
+      )
+    }
+
+    <h1>
+      {title}
+    </h1>
+  </header>
+  <main>
+    <article>
+      <div class="topics">
+        <Topics topics={type ? [...(topics ?? []), type] : (topics ?? [])} />
+      </div>
+      <Zenn html={html} />
+    </article>
+  </main>
+  <style>
+    h1 {
+      font-size: 33px;
+      margin-bottom: 0;
+    }
+    .header-emoji {
+      width: 75px;
+      height: 75px;
+      margin: 0 auto;
+    }
+    .topics {
+      margin: 10px 0;
+    }
+
+    header {
+      text-align: center;
+    }
+    article {
+      max-width: 960px;
+      padding: 20px 40px 40px 40px;
+      margin: 0 0 40px 0;
+      background-color: #ffffff;
+      border-radius: 4px;
+      border: 1px solid #e4edf4;
+    }
+  </style>
+</Layout>
