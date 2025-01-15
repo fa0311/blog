@@ -6,9 +6,35 @@ import markdownToHtml from "./markdownToHtml";
 import * as cheerio from "cheerio";
 import "zenn-content-css";
 
+export type ZennArticle = MarkdownInstance<Article>;
 export const getArticleList = () => {
-  const slugs = import.meta.glob<MarkdownInstance<Article>>("../../../articles/*.md");
+  const slugs = import.meta.glob<ZennArticle>("../../../articles/*.md");
   return Promise.all(Object.values(slugs).map((article) => article()));
+};
+
+export const getRelatedArticles = (articles: ZennArticle[], current: ZennArticle) => {
+  const relatedArticles = articles
+    .filter((article) => article.file !== current.file)
+    .map((article) => {
+      const tagA = article.frontmatter.tags ?? [];
+      const tagB = current.frontmatter.tags ?? [];
+      const similarity = calculateSimilarity(tagA, tagB);
+      return { ...article, similarity, random: Math.random() };
+    })
+    .sort((a, b) => {
+      if (a.similarity !== b.similarity) {
+        return b.similarity - a.similarity;
+      } else {
+        return b.random - a.random;
+      }
+    });
+  return relatedArticles;
+};
+
+const calculateSimilarity = (a: string[], b: string[]) => {
+  const intersection = a.filter((value) => b.includes(value));
+  const union = [...new Set([...a, ...b])];
+  return intersection.length / union.length;
 };
 
 export const markdownToHtmlNormalized = (raw: string) => {
@@ -25,8 +51,7 @@ export const markdownToHtmlNormalized = (raw: string) => {
 
   Array.from([1, 2, 3, 4, 5]).forEach((i) => {
     $(`h${i}`).each((i, el) => {
-      const id = $(el).text().toLowerCase().replace(/\s/g, "-");
-      $(el).attr("id", id);
+      $(el).replaceWith(`<h${i + 1}>${$(el).html()}</h${i + 1}>`);
     });
   });
   return {

@@ -14,9 +14,7 @@
   </body>
 </html>
 
-<style is:global>
-  @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap");
-
+<style>
   html[lang="ja"] {
     font-family: "Meiryo", "sans-serif", "Segoe UI Emoji";
   }
@@ -26,26 +24,26 @@
     line-height: 1.6;
     background: #edf2f7;
     color: #000000d1;
-
     word-break: break-word;
     word-wrap: break-word;
     line-break: strict;
   }
-
+</style>
+<style is:global>
   a {
     color: #000000d1;
     text-decoration: none;
   }
-
-  main {
-    max-width: 830px;
-    padding: 0 40px;
-    margin: 0 auto;
+  ol,
+  li {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
   }
 
-  header,
-  footer {
-    max-width: 830px;
-    padding: 40px calc(max((100% - 830px) / 2, 40px));
+  *,
+  :after,
+  :before {
+    box-sizing: border-box;
   }
 </style>

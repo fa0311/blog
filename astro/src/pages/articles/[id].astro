@@ -2,10 +2,11 @@
 import twemoji from "@twemoji/api";
 import Path from "node:path";
 import "zenn-content-css";
+import Articles from "../../components/Articles.astro";
 import Topics from "../../components/Topics.astro";
 import Zenn from "../../components/Zenn.astro";
 import Layout from "../../layouts/Layout.astro";
-import { getArticleList, markdownToHtmlNormalized } from "../../lib/zenn";
+import { getArticleList, getRelatedArticles, markdownToHtmlNormalized } from "../../lib/zenn";
 
 export const getStaticPaths = async () => {
   const articles = await getArticleList();
@@ -13,6 +14,7 @@ export const getStaticPaths = async () => {
   return articles.map((article) => {
     const slug = Path.basename(article.file, ".md");
     const html = markdownToHtmlNormalized(article.rawContent());
+    const relatedArticles = getRelatedArticles(articles, article).slice(0, 6);
 
     return {
       params: { id: slug },
@@ -22,39 +24,74 @@ export const getStaticPaths = async () => {
         emoji: article.frontmatter.emoji,
         topics: article.frontmatter.topics,
         type: article.frontmatter.type,
+        relatedArticles: relatedArticles.map((article) => ({
+          title: article.frontmatter.title,
+          emoji: article.frontmatter.emoji,
+          slug: Path.basename(article.file, ".md"),
+        })),
       },
     };
   });
 };
-
-const { html, title, emoji, topics, type } = Astro.props;
+const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
 ---
 
 <Layout>
-  <header>
+  <header class="header-content">
     {
       emoji && (
         <div class="header-emoji" set:html={twemoji.parse(emoji, { folder: "svg", ext: ".svg" })} />
       )
     }
-
-    <h1>
-      {title}
-    </h1>
+    <div class="title">
+      <h1>{title}</h1>
+    </div>
   </header>
   <main>
     <article>
-      <div class="topics">
-        <Topics topics={type ? [...(topics ?? []), type] : (topics ?? [])} />
+      <div class="content-main">
+        <div class="topics">
+          <Topics topics={type ? [...(topics ?? []), type] : (topics ?? [])} />
+        </div>
+        <Zenn html={html} />
       </div>
-      <Zenn html={html} />
+
+      <aside>
+        <div class="content-aside">
+          <h2 class="aside-title">目次</h2>
+          <nav>
+            <ol>
+              <li>
+                <a href="#section1">セクション1</a>
+              </li>
+              <li>
+                <a href="#section2">セクション2</a>
+              </li>
+              <li>
+                <a href="#section3">セクション3</a>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </aside>
     </article>
+    <section class="related-articles-content">
+      <h2>Read next</h2>
+      <Articles type="list" data={relatedArticles} />
+    </section>
   </main>
+  <footer>
+    <div class="footer-content">
+      <p>© 114514</p>
+    </div>
+  </footer>
+
   <style>
     h1 {
-      font-size: 33px;
+      font-size: 31px;
       margin-bottom: 0;
     }
+
     .header-emoji {
       width: 75px;
       height: 75px;
@@ -64,16 +101,115 @@ const { html, title, emoji, topics, type } = Astro.props;
       margin: 10px 0;
     }
 
-    header {
-      text-align: center;
+    .header-content {
+      padding: 40px;
+      margin: 0 auto;
+      max-width: 840px;
     }
+
+    main {
+      max-width: 1200px;
+      padding: 0 40px;
+      margin: 0 auto;
+    }
+
     article {
-      max-width: 960px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 30px;
+    }
+    @media (max-width: 920px) {
+      article {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        display: none;
+      }
+    }
+
+    .aside-title {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .content-main {
+      max-width: 830px;
       padding: 20px 40px 40px 40px;
       margin: 0 0 40px 0;
+      background-color: #fff;
+      border-radius: 4px;
+      border: 1px solid #e4edf4;
+    }
+
+    .related-articles-content {
+      margin: 0 auto;
+      max-width: 880px;
+      padding: 0 0 40px;
+    }
+
+    .related-articles-content h2 {
+      font-size: 1.7rem;
+      font-weight: 700;
+    }
+
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    aside {
+      width: 300px;
+    }
+    .content-aside {
+      position: sticky;
+      top: 30px;
+      padding: 20px 20px 25px;
       background-color: #ffffff;
       border-radius: 4px;
       border: 1px solid #e4edf4;
+      margin: 0 0 40px 0;
+    }
+
+    section {
+      margin: 0 0 40px 0;
+    }
+
+    ol {
+      position: relative;
+    }
+
+    ol:before {
+      position: absolute;
+      top: 17px;
+      bottom: 8px;
+      left: 5px;
+      width: 2px;
+      content: "";
+      background: #e0efff;
+      border-radius: 0 0 5px 5px;
+    }
+
+    li {
+      position: relative;
+      padding-left: 21px;
+      margin-top: 5px;
+      font-weight: 700;
+    }
+
+    li:before {
+      top: 4px;
+      left: 0;
+      width: 12px;
+      height: 12px;
+      background: #3ea8ff; /* #b0d3f9; */
+      /* border: 2px solid #e0efff; */
+      border: 2px solid #ffffffff;
+
+      position: absolute;
+      content: "";
+      border-radius: 50%;
     }
   </style>
 </Layout>

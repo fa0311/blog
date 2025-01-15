@@ -2,7 +2,7 @@
 import twemoji from "@twemoji/api";
 import Path from "path";
 import "zenn-content-css";
-import Article from "../../components/Article.astro";
+import Articles from "../../components/Articles.astro";
 import Layout from "../../layouts/Layout.astro";
 import { getArticleList, markdownToHtmlNormalized } from "../../lib/zenn";
 
@@ -41,55 +41,51 @@ const { data, emoji } = Astro.props;
 
 <Layout>
   <header>
-    {
-      emoji && (
-        <div
-          class="header-emoji"
-          set:html={twemoji.parse(emoji!, { folder: "svg", ext: ".svg" })}
-        />
-      )
-    }
-
-    <h1>
-      {topic}
-    </h1>
+    <div class="center">
+      {
+        emoji && (
+          <div
+            class="header-emoji"
+            set:html={twemoji.parse(emoji!, { folder: "svg", ext: ".svg" })}
+          />
+        )
+      }
+      <h1>
+        {topic}
+      </h1>
+    </div>
   </header>
-  <main>
+  <main class="center">
     <section>
       <h2>Articles</h2>
-      <div class="article-list">
-        {
-          data.map(({ title, emoji, slug }) => (
-            <Article title={title ?? ""} emoji={emoji} slug={slug} />
-          ))
-        }
-      </div>
+      <Articles type="list" data={data} />
     </section>
   </main>
-
-  <style>
-    .article-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      align-items: flex-start;
-      justify-content: space-between;
-    }
-
-    header {
-      display: flex;
-      flex-direction: row;
-      background-color: #ffffff;
-    }
-
-    .header-emoji {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin-right: 1.7rem;
-
-      border: 1px solid #e4edf4;
-    }
-  </style>
 </Layout>
+
+<style>
+  header {
+    background-color: #ffffff;
+    padding: 40px 0;
+  }
+
+  header > .center {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .header-emoji {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 1.7rem;
+    border: 1px solid #e4edf4;
+  }
+
+  @media (max-width: 375px) {
+    .header-emoji {
+      display: none;
+    }
+  }
+</style>
