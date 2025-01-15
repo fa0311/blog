@@ -15,6 +15,8 @@ export const getStaticPaths = async () => {
     const slug = Path.basename(article.file, ".md");
     const html = markdownToHtmlNormalized(article.rawContent());
     const relatedArticles = getRelatedArticles(articles, article).slice(0, 6);
+    const headings = article.getHeadings();
+    const secondDepth = headings.length > 1 ? headings[1].depth : headings[0].depth;
 
     return {
       params: { id: slug },
@@ -24,6 +26,13 @@ export const getStaticPaths = async () => {
         emoji: article.frontmatter.emoji,
         topics: article.frontmatter.topics,
         type: article.frontmatter.type,
+        nav: headings
+          .filter((heading) => heading.depth - secondDepth < 2)
+          .map((article) => ({
+            title: article.text,
+            slug: article.slug,
+            depth: secondDepth >= article.depth ? 1 : 2,
+          })),
         relatedArticles: relatedArticles.map((article) => ({
           title: article.frontmatter.title,
           emoji: article.frontmatter.emoji,
@@ -33,7 +42,7 @@ export const getStaticPaths = async () => {
     };
   });
 };
-const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
+const { relatedArticles, html, title, emoji, topics, type, nav } = Astro.props;
 ---
 
 <Layout>
@@ -57,19 +66,17 @@ const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
       </div>
 
       <aside>
-        <div class="content-aside">
-          <h2 class="aside-title">目次</h2>
+        <div class="content-nav">
+          <h2 class="nav-title">目次</h2>
           <nav>
             <ol>
-              <li>
-                <a href="#section1">セクション1</a>
-              </li>
-              <li>
-                <a href="#section2">セクション2</a>
-              </li>
-              <li>
-                <a href="#section3">セクション3</a>
-              </li>
+              {
+                nav.map(({ title, slug, depth }) => (
+                  <li class:list={[`depth-${depth}`]}>
+                    <a href={`#${slug}`}>{title}</a>
+                  </li>
+                ))
+              }
             </ol>
           </nav>
         </div>
@@ -88,8 +95,8 @@ const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
 
   <style>
     h1 {
-      font-size: 31px;
-      margin-bottom: 0;
+      font-size: 24px;
+      margin: 24px 0px 0px;
     }
 
     .header-emoji {
@@ -102,7 +109,7 @@ const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
     }
 
     .header-content {
-      padding: 40px;
+      padding: 60px;
       margin: 0 auto;
       max-width: 840px;
     }
@@ -128,7 +135,12 @@ const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
       }
     }
 
-    .aside-title {
+    .title {
+      display: flex;
+      justify-content: center;
+    }
+
+    .nav-title {
       margin: 0;
       font-size: 16px;
     }
@@ -140,6 +152,7 @@ const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
       background-color: #fff;
       border-radius: 4px;
       border: 1px solid #e4edf4;
+      overflow: hidden;
     }
 
     .related-articles-content {
@@ -162,7 +175,7 @@ const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
     aside {
       width: 300px;
     }
-    .content-aside {
+    .content-nav {
       position: sticky;
       top: 30px;
       padding: 20px 20px 25px;
@@ -187,29 +200,65 @@ const { relatedArticles, html, title, emoji, topics, type } = Astro.props;
       left: 5px;
       width: 2px;
       content: "";
-      background: #e0efff;
+      background: #99cbf4;
       border-radius: 0 0 5px 5px;
     }
 
     li {
       position: relative;
       padding-left: 21px;
-      margin-top: 5px;
-      font-weight: 700;
     }
 
     li:before {
-      top: 4px;
-      left: 0;
-      width: 12px;
-      height: 12px;
-      background: #3ea8ff; /* #b0d3f9; */
-      /* border: 2px solid #e0efff; */
       border: 2px solid #ffffffff;
-
       position: absolute;
       content: "";
       border-radius: 50%;
     }
+
+    li.depth-1 a {
+      color: #838d95;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    li.depth-2 a {
+      color: #65717b;
+      font-size: 14px;
+    }
+
+    li.depth-1:before {
+      top: 4px;
+      left: 0;
+      width: 12px;
+      height: 12px;
+      background: #99cbf4;
+      border: 2px solid #fff;
+    }
+
+    li.depth-2:before {
+      top: 6px;
+      left: 2px;
+      width: 8px;
+      height: 8px;
+      background: #99cbf4;
+      border: 2px solid #fff;
+    }
+
+    li:hover a {
+      color: #333333;
+    }
+
+    li:hover:before {
+      background: #3ea8ff;
+    }
+
+    /* 
+  top: 6px;
+  left: -19px;
+  width: 8px;
+  height: 8px;
+  background: #d9eafb;
+  border: 2px solid #fff; */
   </style>
 </Layout>

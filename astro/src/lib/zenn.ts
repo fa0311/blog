@@ -49,11 +49,12 @@ export const markdownToHtmlNormalized = (raw: string) => {
     $(el).attr("src", src);
   });
 
-  Array.from([1, 2, 3, 4, 5]).forEach((i) => {
-    $(`h${i}`).each((i, el) => {
-      $(el).replaceWith(`<h${i + 1}>${$(el).html()}</h${i + 1}>`);
-    });
-  });
+  // Array.from([5, 4, 3, 2, 1]).forEach((i) => {
+  //   $(`h${i}`).each((_, el) => {
+  //     console.log($(`h${i}`).html());
+  //     $(el).replaceWith(`<h${i + 1}>${$(el).html()}</h${i + 1}>`);
+  //   });
+  // });
   return {
     contents: () => $("body").html()!,
     description: () => $("p").first().text(),
