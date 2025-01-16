@@ -1,11 +1,11 @@
 ---
-import twemoji from "@twemoji/api";
+import Emoji from "./Emoji.astro";
 
 interface Props {
   type: "list" | "card";
   data: {
-    title?: string;
-    emoji?: string;
+    title: string;
+    emoji: string;
     slug: string;
   }[];
 }
@@ -19,14 +19,13 @@ const { type, data } = Astro.props;
       <a href={`/articles/${slug}`}>
         <article>
           <div class="article-header">
-            {emoji && (
-              <div
-                class="article-emoji"
-                set:html={twemoji.parse(emoji, { folder: "svg", ext: ".svg" })}
-              />
-            )}
+            <div class="article-emoji">
+              <Emoji emoji={emoji} />
+            </div>
           </div>
-          <div class="article-body">{title && <h2 class="article-title">{title}</h2>}</div>
+          <div class="article-body">
+            <h2 class="article-title">{title}</h2>
+          </div>
         </article>
       </a>
     ))
@@ -107,7 +106,7 @@ const { type, data } = Astro.props;
   .article-title {
     margin: 0;
     font-size: 1.05rem;
-    font-weight: 700;
+    font-weight: bold;
     text-wrap: wrap;
     display: -webkit-box;
     line-height: 1.5;

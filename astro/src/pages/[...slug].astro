@@ -1,0 +1,124 @@
+---
+import "zenn-content-css";
+import Articles from "../components/Articles.astro";
+import Layout from "../layouts/Layout.astro";
+import { getArticleData } from "../lib/zenn";
+
+export const getStaticPaths = async () => {
+  const data = await getArticleData();
+  const page = Array.from({ length: Math.ceil(data.length / 48) }, (_, i) => {
+    return {
+      page: i + 1,
+      slug: (i + 1).toString(),
+      data: data.slice(i * 48, i * 48 + 48),
+    };
+  });
+  const param = [{ data: data.slice(0, 48), page: 1, slug: "" }, ...page];
+
+  return param.map((param) => {
+    return {
+      params: { slug: param.slug },
+      props: {
+        page: param.page,
+        pageLength: page.length,
+        data: param.data.map((article) => {
+          return {
+            slug: article.slug,
+            title: article.frontmatter.title,
+            emoji: article.frontmatter.emoji,
+          };
+        }),
+      },
+    };
+  });
+};
+
+const { data, page, pageLength } = Astro.props;
+---
+
+<Layout>
+  <main>
+    <section>
+      <h2>Articles</h2>
+      <Articles type="list" data={data} />
+    </section>
+    <section class="pagination">
+      {
+        page > 1 && (
+          <a href={`/${page - 1}`}>
+            <p class="pagination-prev">
+              <span class="icon">←</span>
+              {page - 1}ページへ
+            </p>
+          </a>
+        )
+      }
+      {
+        page < pageLength && (
+          <a href={`/${page + 1}`}>
+            <p class="pagination-next">
+              次のページへ
+              <span class="icon">→</span>
+            </p>
+          </a>
+        )
+      }
+    </section>
+  </main>
+</Layout>
+
+<style>
+  header {
+    background-color: #ffffff;
+  }
+
+  .header-content {
+    max-width: 880px;
+    padding: 40px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 30px;
+  }
+
+  .header-emoji {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid #e4edf4;
+  }
+
+  @media (max-width: 375px) {
+    .header-emoji {
+      display: none;
+    }
+  }
+
+  main {
+    max-width: 880px;
+    padding: 0 40px;
+    margin: 0 auto;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    gap: 10px;
+  }
+
+  .pagination-next,
+  .pagination-prev {
+    padding: 7px 16px;
+  }
+  .pagination-prev,
+  .icon {
+    color: #8f9faa;
+  }
+  .pagination-next {
+    background: #f5fbff;
+    border: 1px solid #d6e3ed;
+    border-radius: 99rem;
+  }
+</style>

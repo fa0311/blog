@@ -39,7 +39,7 @@ importers:
         version: 8.20.0(eslint@9.18.0)(typescript@5.7.3)
       astro:
         specifier: ^5.1.5
-        version: 5.1.6(typescript@5.7.3)
+        version: 5.1.6(@types/node@22.10.6)(rollup@4.30.1)(typescript@5.7.3)
       cheerio:
         specifier: ^1.0.0
         version: 1.0.0
@@ -55,6 +55,9 @@ importers:
       prettier-plugin-astro:
         specifier: ^0.14.1
         version: 0.14.1
+      simple-git:
+        specifier: ^3.27.0
+        version: 3.27.0
       zenn-markdown-html:
         specifier: ^0.1.158
         version: 0.1.158(@types/markdown-it@14.1.2)
@@ -553,6 +556,12 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
+
+  '@kwsites/file-exists@1.1.1':
+    resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==}
+
+  '@kwsites/promise-deferred@1.1.1':
+    resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1911,6 +1920,9 @@ packages:
   shiki@1.26.2:
     resolution: {integrity: sha512-iP7u2NA9A6JwRRCkIUREEX2cMhlYV5EBmbbSlfSRvPThwca8HBRbVkWuNWW+kw9+i6BSUZqqG6YeUs5dC2SjZw==}
 
+  simple-git@3.27.0:
+    resolution: {integrity: sha512-ivHoFS9Yi9GY49ogc6/YAi3Fl9ROnF4VyubNylgCkA+RVqLaKWnDSzXOVzya8csELIaWaYNutsEuAhZrtOjozA==}
+
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
 
@@ -2639,6 +2651,14 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
+  '@kwsites/file-exists@1.1.1':
+    dependencies:
+      debug: 4.4.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@kwsites/promise-deferred@1.1.1': {}
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -2655,11 +2675,13 @@ snapshots:
 
   '@pkgr/core@0.1.1': {}
 
-  '@rollup/pluginutils@5.1.4':
+  '@rollup/pluginutils@5.1.4(rollup@4.30.1)':
     dependencies:
       '@types/estree': 1.0.6
       estree-walker: 2.0.2
       picomatch: 4.0.2
+    optionalDependencies:
+      rollup: 4.30.1
 
   '@rollup/rollup-android-arm-eabi@4.30.1':
     optional: true
@@ -2918,14 +2940,14 @@ snapshots:
       - supports-color
       - typescript
 
-  astro@5.1.6(typescript@5.7.3):
+  astro@5.1.6(@types/node@22.10.6)(rollup@4.30.1)(typescript@5.7.3):
     dependencies:
       '@astrojs/compiler': 2.10.3
       '@astrojs/internal-helpers': 0.4.2
       '@astrojs/markdown-remark': 6.0.1
       '@astrojs/telemetry': 3.2.0
       '@oslojs/encoding': 1.1.0
-      '@rollup/pluginutils': 5.1.4
+      '@rollup/pluginutils': 5.1.4(rollup@4.30.1)
       '@types/cookie': 0.6.0
       acorn: 8.14.0
       aria-query: 5.3.2
@@ -2970,8 +2992,8 @@ snapshots:
       unist-util-visit: 5.0.0
       unstorage: 1.14.4
       vfile: 6.0.3
-      vite: 6.0.7
-      vitefu: 1.0.5(vite@6.0.7)
+      vite: 6.0.7(@types/node@22.10.6)
+      vitefu: 1.0.5(vite@6.0.7(@types/node@22.10.6))
       which-pm: 3.0.0
       xxhash-wasm: 1.1.0
       yargs-parser: 21.1.1
@@ -4466,6 +4488,14 @@ snapshots:
       '@shikijs/vscode-textmate': 10.0.1
       '@types/hast': 3.0.4
 
+  simple-git@3.27.0:
+    dependencies:
+      '@kwsites/file-exists': 1.1.1
+      '@kwsites/promise-deferred': 1.1.1
+      debug: 4.4.0
+    transitivePeerDependencies:
+      - supports-color
+
   simple-swizzle@0.2.2:
     dependencies:
       is-arrayish: 0.3.2
@@ -4547,7 +4577,7 @@ snapshots:
       typescript: 5.7.3
 
   tsconfck@3.1.4(typescript@5.7.3):
-    dependencies:
+    optionalDependencies:
       typescript: 5.7.3
 
   tslib@2.8.1: {}
@@ -4666,17 +4696,18 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vite@6.0.7:
+  vite@6.0.7(@types/node@22.10.6):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.5.0
       rollup: 4.30.1
     optionalDependencies:
+      '@types/node': 22.10.6
       fsevents: 2.3.3
 
-  vitefu@1.0.5(vite@6.0.7):
-    dependencies:
-      vite: 6.0.7
+  vitefu@1.0.5(vite@6.0.7(@types/node@22.10.6)):
+    optionalDependencies:
+      vite: 6.0.7(@types/node@22.10.6)
 
   web-namespaces@2.0.1: {}
 

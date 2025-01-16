@@ -1,5 +1,6 @@
 ---
-import twemoji from "@twemoji/api";
+import Emoji from "./Emoji.astro";
+
 interface Props {
   topics: string[];
 }
@@ -11,7 +12,9 @@ const { topics } = Astro.props;
   {
     topics.map((topic) => (
       <a href={`/topics/${topic}`} class="topic">
-        <div class="topic-icon" set:html={twemoji.parse("#⃣", { folder: "svg", ext: ".svg" })} />
+        <div class="topic-icon">
+          <Emoji emoji="#⃣" />
+        </div>
         <p class="topic-item">{topic}</p>
       </a>
     ))
