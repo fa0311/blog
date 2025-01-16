@@ -1,37 +1,31 @@
 ---
 import "zenn-content-css";
-import Articles from "../../components/Articles.astro";
-import Emoji from "../../components/Emoji.astro";
-import Layout from "../../layouts/Layout.astro";
-import { getArticleData } from "../../lib/zenn";
+import Articles from "../../../components/Articles.astro";
+import Emoji from "../../../components/Emoji.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { getArticleData } from "../../../lib/zenn";
 
 export const getStaticPaths = async () => {
   const articles = await getArticleData();
-  const types = articles.flatMap((article) => article.frontmatter.type);
+  const types = articles.map((article) => article.frontmatter.type);
   const topics = articles.flatMap((article) => article.frontmatter.topics);
   return [...new Set([...topics, ...types])].flatMap((topic) => {
     const data = articles.filter((article) => {
       const articleTopics = article.frontmatter.topics;
       return articleTopics.includes(topic) || article.frontmatter.type === topic;
     });
-    const page = Array.from({ length: Math.ceil(data.length / 48) }, (_, i) => {
-      return {
-        page: i + 1,
-        slug: `${topic}/${i + 1}`,
-        data: data.slice(i * 48, i * 48 + 48),
-      };
-    });
-    const param = [{ slug: topic, data: data.slice(0, 48), page: 1 }, ...page];
+    const pageLength = Math.ceil(data.length / 48);
 
-    return param.map((param) => {
+    return Array.from({ length: pageLength }, (_, i) => {
+      const index = i + 1;
       return {
-        params: { slug: param.slug },
+        params: { index: index, topic: topic },
         props: {
           emoji: "#⃣",
           topic: topic,
-          page: param.page,
-          pageLength: page.length,
-          data: param.data.map((article) => {
+          page: index,
+          pageLength: pageLength,
+          data: data.slice(i * 48, i * 48 + 48).map((article) => {
             return {
               slug: article.slug,
               title: article.frontmatter.title,
@@ -131,17 +125,34 @@ const { topic, data, emoji, pageLength, page } = Astro.props;
     gap: 10px;
   }
 
-  .pagination-next,
   .pagination-prev {
+    color: #8f9faa;
     padding: 7px 16px;
   }
-  .pagination-prev,
-  .icon {
-    color: #8f9faa;
+
+  .pagination-prev:hover {
+    background: #edf2f7;
+    color: #000000d1;
   }
+  .pagination-next:hover {
+    background: #f5fbff;
+    border-color: #d6e3ed;
+  }
+
+  a:focus .pagination-next {
+    border: 1px solid #3ea8ff;
+    box-shadow: 0 0 0 2.5px #bfdcff;
+  }
+
   .pagination-next {
+    color: #000000d1;
+    padding: 7px 16px;
     background: #f5fbff;
     border: 1px solid #d6e3ed;
     border-radius: 99rem;
+  }
+
+  .pagination-next .icon {
+    color: #8f9faa;
   }
 </style>

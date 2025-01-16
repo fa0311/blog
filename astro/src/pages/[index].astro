@@ -6,22 +6,15 @@ import { getArticleData } from "../lib/zenn";
 
 export const getStaticPaths = async () => {
   const data = await getArticleData();
-  const page = Array.from({ length: Math.ceil(data.length / 48) }, (_, i) => {
+  const pageLength = Math.ceil(data.length / 48);
+  return Array.from({ length: pageLength }, (_, i) => {
+    const page = i + 1;
     return {
-      page: i + 1,
-      slug: (i + 1).toString(),
-      data: data.slice(i * 48, i * 48 + 48),
-    };
-  });
-  const param = [{ data: data.slice(0, 48), page: 1, slug: "" }, ...page];
-
-  return param.map((param) => {
-    return {
-      params: { slug: param.slug },
+      params: { index: page },
       props: {
-        page: param.page,
-        pageLength: page.length,
-        data: param.data.map((article) => {
+        page: page,
+        pageLength: pageLength,
+        data: data.slice(i * 48, i * 48 + 48).map((article) => {
           return {
             slug: article.slug,
             title: article.frontmatter.title,
@@ -68,35 +61,8 @@ const { data, page, pageLength } = Astro.props;
 </Layout>
 
 <style>
-  header {
-    background-color: #ffffff;
-  }
-
-  .header-content {
-    max-width: 880px;
-    padding: 40px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 100px 1fr;
-    gap: 30px;
-  }
-
-  .header-emoji {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 1px solid #e4edf4;
-  }
-
-  @media (max-width: 375px) {
-    .header-emoji {
-      display: none;
-    }
-  }
-
   main {
-    max-width: 880px;
+    max-width: 960px;
     padding: 0 40px;
     margin: 0 auto;
   }

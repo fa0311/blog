@@ -38,11 +38,13 @@ import Emoji from "../components/Emoji.astro";
 </html>
 
 <style>
-  html[lang="ja"] {
+  html {
+    height: 100%;
     font-family: "Meiryo", "sans-serif", "Segoe UI Emoji";
   }
 
   body {
+    height: 100%;
     margin: 0;
     line-height: 1.6;
     background: #edf2f7;
@@ -53,7 +55,6 @@ import Emoji from "../components/Emoji.astro";
   }
 
   header {
-    /* position: sticky; */
     background: #ffffff;
     padding: 1rem 2rem;
     top: 0;
@@ -61,6 +62,8 @@ import Emoji from "../components/Emoji.astro";
   }
 
   footer {
+    position: sticky;
+    top: 100vh;
     margin: 40px 0 0 0;
     background-color: #f8f9fa;
     padding: 20px 0;
