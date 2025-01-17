@@ -1,12 +1,12 @@
 ---
 import "zenn-content-css";
-import Articles from "../../components/Articles.astro";
-import Emoji from "../../components/Emoji.astro";
-import Navigation from "../../components/Navigation.astro";
-import Topics from "../../components/Topics.astro";
-import Zenn from "../../components/Zenn.astro";
-import Layout from "../../layouts/Layout.astro";
-import { getArticleData } from "../../lib/zenn";
+import Articles from "../../../components/Articles.astro";
+import Emoji from "../../../components/Emoji.astro";
+import Navigation from "../../../components/Navigation.astro";
+import Topics from "../../../components/Topics.astro";
+import Zenn from "../../../components/Zenn.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { getArticleData } from "../../../lib/zenn";
 
 export const getStaticPaths = async () => {
   const articles = await getArticleData();
@@ -145,6 +145,7 @@ const { relatedArticles, lastCommit, html, title, emoji, topics, type, nav } = A
       background-color: #fff;
       border-radius: 4px;
       border: 1px solid #e4edf4;
+      overflow: hidden;
     }
 
     .related-articles-content {

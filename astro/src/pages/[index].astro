@@ -1,6 +1,7 @@
 ---
 import "zenn-content-css";
 import Articles from "../components/Articles.astro";
+import Pagination from "../components/Pagination.astro";
 import Layout from "../layouts/Layout.astro";
 import { getArticleData } from "../lib/zenn";
 
@@ -35,27 +36,8 @@ const { data, page, pageLength } = Astro.props;
       <h2>Articles</h2>
       <Articles type="list" data={data} />
     </section>
-    <section class="pagination">
-      {
-        page > 1 && (
-          <a href={`/${page - 1}`}>
-            <p class="pagination-prev">
-              <span class="icon">←</span>
-              {page - 1}ページへ
-            </p>
-          </a>
-        )
-      }
-      {
-        page < pageLength && (
-          <a href={`/${page + 1}`}>
-            <p class="pagination-next">
-              次のページへ
-              <span class="icon">→</span>
-            </p>
-          </a>
-        )
-      }
+    <section>
+      <Pagination page={page} pageLength={pageLength} />
     </section>
   </main>
 </Layout>
@@ -65,26 +47,5 @@ const { data, page, pageLength } = Astro.props;
     max-width: 960px;
     padding: 0 40px;
     margin: 0 auto;
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 40px;
-    gap: 10px;
-  }
-
-  .pagination-next,
-  .pagination-prev {
-    padding: 7px 16px;
-  }
-  .pagination-prev,
-  .icon {
-    color: #8f9faa;
-  }
-  .pagination-next {
-    background: #f5fbff;
-    border: 1px solid #d6e3ed;
-    border-radius: 99rem;
   }
 </style>

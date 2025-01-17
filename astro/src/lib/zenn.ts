@@ -126,10 +126,10 @@ export const markdownToHtmlNormalized = (raw: string) => {
 
   const $ = cheerio.load(html);
 
-  $(`img`).each((i, el) => {
-    const src = $(el).attr("src")!.slice("images/".length);
-    $(el).attr("src", src);
-  });
+  // $(`img`).each((i, el) => {
+  //   const src = $(el).attr("src")!.slice("images/".length);
+  //   $(el).attr("src", src);
+  // });
 
   // Array.from([5, 4, 3, 2, 1]).forEach((i) => {
   //   $(`h${i}`).each((_, el) => {
