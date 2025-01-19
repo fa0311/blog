@@ -1,26 +1,26 @@
 ---
 interface Props {
-  page: number;
-  pageLength: number;
+  index: number;
+  length: number;
 }
 
-const { page, pageLength } = Astro.props;
+const { index, length } = Astro.props;
 ---
 
 <div class="pagination">
   {
-    page > 1 && (
-      <a href={`/${page - 1}`}>
+    index > 1 && (
+      <a href={`/${index - 1}`}>
         <p class="pagination-prev">
           <span class="icon">←</span>
-          {page - 1}ページへ
+          {index - 1}ページへ
         </p>
       </a>
     )
   }
   {
-    page < pageLength && (
-      <a href={`/${page + 1}`}>
+    index < length && (
+      <a href={`/${index + 1}`}>
         <p class="pagination-next">
           次のページへ
           <span class="icon">→</span>

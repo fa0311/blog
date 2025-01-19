@@ -22,10 +22,17 @@ export const getStaticPaths = async () => {
       return `${y}/${m}/${d}`;
     })();
 
+    const html = article.getContent().contents();
+    const description = (() => {
+      const text = article.getContent().description();
+      return text.length > 120 ? `${text.slice(0, 117)}...` : text;
+    })();
+
     return {
       params: { id: article.slug },
       props: {
-        html: article.getContent().contents(),
+        html: html,
+        description: description,
         title: article.frontmatter.title,
         emoji: article.frontmatter.emoji,
         topics: article.frontmatter.topics,
@@ -45,10 +52,11 @@ export const getStaticPaths = async () => {
     };
   });
 };
-const { relatedArticles, lastCommit, html, title, emoji, topics, type, nav } = Astro.props;
+const { relatedArticles, lastCommit, html, title, emoji, topics, type, nav, description } =
+  Astro.props;
 ---
 
-<Layout>
+<Layout title={title} description={description} keywords={topics} ogp={`${Astro.url}/ogp.png`}>
   <header class="header-content">
     <div class="header-emoji">
       <Emoji emoji={emoji} />

@@ -4,29 +4,25 @@ import Articles from "../../../components/Articles.astro";
 import Emoji from "../../../components/Emoji.astro";
 import Pagination from "../../../components/Pagination.astro";
 import Layout from "../../../layouts/Layout.astro";
-import { getArticleData } from "../../../lib/zenn";
+import { getArticleData, getTopics, pageSplit } from "../../../lib/zenn";
 
 export const getStaticPaths = async () => {
   const articles = await getArticleData();
-  const types = articles.map((article) => article.frontmatter.type);
-  const topics = articles.flatMap((article) => article.frontmatter.topics);
-  return [...new Set([...topics, ...types])].flatMap((topic) => {
+  return getTopics(articles).flatMap((topic) => {
     const data = articles.filter((article) => {
       const articleTopics = article.frontmatter.topics;
       return articleTopics.includes(topic) || article.frontmatter.type === topic;
     });
-    const pageLength = Math.ceil(data.length / 48);
 
-    return Array.from({ length: pageLength }, (_, i) => {
-      const index = i + 1;
+    return pageSplit(data).map(({ data, index, length }) => {
       return {
         params: { index: index, topic: topic },
         props: {
           emoji: "#⃣",
           topic: topic,
-          page: index,
-          pageLength: pageLength,
-          data: data.slice(i * 48, i * 48 + 48).map((article) => {
+          index: index,
+          length: length,
+          data: data.map((article) => {
             return {
               slug: article.slug,
               title: article.frontmatter.title,
@@ -39,10 +35,15 @@ export const getStaticPaths = async () => {
   });
 };
 
-const { topic, data, emoji, pageLength, page } = Astro.props;
+const { topic, data, emoji, length, index } = Astro.props;
 ---
 
-<Layout>
+<Layout
+  title={topic}
+  description={`${topic}の記事一覧`}
+  keywords={[topic]}
+  canonical={index === 1 ? new URL(".", Astro.url) : Astro.url}
+>
   <header>
     <div class="header-content">
       <div class="header-emoji">
@@ -57,45 +58,46 @@ const { topic, data, emoji, pageLength, page } = Astro.props;
       <Articles type="list" data={data} />
     </section>
     <section>
-      <Pagination page={page} pageLength={pageLength} />
+      <Pagination index={index} length={length} />
     </section>
   </main>
-</Layout>
-<style>
-  header {
-    background-color: #ffffff;
-  }
 
-  h2 {
-    margin-top: 40px;
-  }
-
-  .header-content {
-    max-width: 960px;
-    padding: 30px 40px 50px 40px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 100px 1fr;
-    gap: 30px;
-  }
-
-  .header-emoji {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 1px solid #e4edf4;
-  }
-
-  @media (max-width: 375px) {
-    .header-emoji {
-      display: none;
+  <style>
+    header {
+      background-color: #ffffff;
     }
-  }
 
-  main {
-    max-width: 960px;
-    padding: 0 40px;
-    margin: 0 auto;
-  }
-</style>
+    h2 {
+      margin-top: 40px;
+    }
+
+    .header-content {
+      max-width: 960px;
+      padding: 30px 40px 50px 40px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 30px;
+    }
+
+    .header-emoji {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid #e4edf4;
+    }
+
+    @media (max-width: 375px) {
+      .header-emoji {
+        display: none;
+      }
+    }
+
+    main {
+      max-width: 960px;
+      padding: 0 40px;
+      margin: 0 auto;
+    }
+  </style>
+</Layout>

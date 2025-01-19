@@ -1,15 +1,11 @@
 ---
-import { getArticleData } from "../../../lib/zenn";
+import { getArticleData, getTopics } from "../../../lib/zenn";
 
 export const getStaticPaths = async () => {
   const articles = await getArticleData();
-  const types = articles.map((article) => article.frontmatter.type);
-  const topics = articles.flatMap((article) => article.frontmatter.topics);
-  return [...new Set([...topics, ...types])].map((topic) => {
+  return getTopics(articles).map((topic) => {
     return {
-      params: {
-        topic: topic,
-      },
+      params: { topic: topic },
     };
   });
 };

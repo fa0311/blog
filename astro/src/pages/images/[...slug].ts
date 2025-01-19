@@ -2,9 +2,9 @@ import type { APIRoute } from "astro";
 import { promises as fs } from "node:fs";
 import Path, { sep } from "node:path";
 
-export const GET: APIRoute = async ({ params, request }) => {
-  const body = await fs.readFile(`../images/${params.slug}`);
-
+export const GET: APIRoute = async ({ params, props }) => {
+  const path = new URL(`../../../../images/${params.slug}`, import.meta.url);
+  const body = await fs.readFile(path);
   return new Response(body, {
     headers: {
       "Content-Type": "image/png",

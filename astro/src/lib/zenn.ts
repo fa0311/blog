@@ -13,7 +13,7 @@ type Frontmatter = {
   type: "tech" | "idea";
   topics: string[];
   published: boolean;
-  astro?: boolean;
+  static?: boolean;
 };
 
 type ArticleListRawResponse = {
@@ -37,7 +37,7 @@ type ArticleListResponse = {
 
 const getArticleList = async (): Promise<ArticleListResponse[]> => {
   const raw = await getArticleListRaw();
-  const enable = raw.filter((article) => article.contents.frontmatter.astro === true);
+  const enable = raw.filter((article) => article.contents.frontmatter.static === true);
   const article = enable.map(async (article) => {
     const lastCommit = await getLatestCommitTime(Path.relative("../../", article.file));
     return { ...article, lastCommit };
@@ -48,6 +48,19 @@ const getArticleList = async (): Promise<ArticleListResponse[]> => {
 export const getArticleData = async () => {
   const data = await getArticleList();
   return getArticleDataRecursive(data.sort((a, b) => timeSort(a.lastCommit, b.lastCommit)));
+};
+
+export const getTopics = (articles: ReturnType<typeof getArticleDataRecursive>) => {
+  const topics = articles.flatMap((article) => article.frontmatter.topics);
+  const types = articles.map((article) => article.frontmatter.type);
+  return [...new Set([...topics, ...types])];
+};
+
+export const pageSplit = <T1>(data: T1[]) => {
+  const length = Math.max(Math.ceil(data.length / 48), 1);
+  return Array.from({ length }).map((_, i) => {
+    return { data: data.slice(i * 48, (i + 1) * 48), index: i + 1, length: length };
+  });
 };
 
 const getArticleDataRecursive = (articles: ArticleListResponse[]) => {

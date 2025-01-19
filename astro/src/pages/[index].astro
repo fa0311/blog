@@ -3,19 +3,17 @@ import "zenn-content-css";
 import Articles from "../components/Articles.astro";
 import Pagination from "../components/Pagination.astro";
 import Layout from "../layouts/Layout.astro";
-import { getArticleData } from "../lib/zenn";
+import { getArticleData, pageSplit } from "../lib/zenn";
 
 export const getStaticPaths = async () => {
   const data = await getArticleData();
-  const pageLength = Math.ceil(data.length / 48);
-  return Array.from({ length: pageLength }, (_, i) => {
-    const page = i + 1;
+  return pageSplit(data).map(({ data, index, length }) => {
     return {
-      params: { index: page },
+      params: { index: index },
       props: {
-        page: page,
-        pageLength: pageLength,
-        data: data.slice(i * 48, i * 48 + 48).map((article) => {
+        index: index,
+        length: length,
+        data: data.map((article) => {
           return {
             slug: article.slug,
             title: article.frontmatter.title,
@@ -27,17 +25,23 @@ export const getStaticPaths = async () => {
   });
 };
 
-const { data, page, pageLength } = Astro.props;
+const { data, index, length } = Astro.props;
 ---
 
-<Layout>
+<Layout
+  title="Articles"
+  description="記事一覧"
+  keywords={["記事一覧"]}
+  robots="nosnippet"
+  canonical={index === 1 ? new URL(".", Astro.url) : Astro.url}
+>
   <main>
     <section>
       <h2>Articles</h2>
       <Articles type="list" data={data} />
     </section>
     <section>
-      <Pagination page={page} pageLength={pageLength} />
+      <Pagination index={index} length={length} />
     </section>
   </main>
 </Layout>
