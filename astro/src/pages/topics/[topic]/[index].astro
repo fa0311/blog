@@ -4,6 +4,7 @@ import Articles from "../../../components/Articles.astro";
 import Emoji from "../../../components/Emoji.astro";
 import Pagination from "../../../components/Pagination.astro";
 import Layout from "../../../layouts/Layout.astro";
+import { topicsConfig } from "../../../lib/topics";
 import { getArticleData, getTopics, pageSplit } from "../../../lib/zenn";
 
 export const getStaticPaths = async () => {
@@ -18,7 +19,6 @@ export const getStaticPaths = async () => {
       return {
         params: { index: index, topic: topic },
         props: {
-          emoji: "#⃣",
           topic: topic,
           index: index,
           length: length,
@@ -35,7 +35,7 @@ export const getStaticPaths = async () => {
   });
 };
 
-const { topic, data, emoji, length, index } = Astro.props;
+const { topic, data, length, index } = Astro.props;
 ---
 
 <Layout
@@ -47,7 +47,7 @@ const { topic, data, emoji, length, index } = Astro.props;
   <header>
     <div class="header-content">
       <div class="header-emoji">
-        <Emoji emoji={emoji} />
+        <Emoji emoji={topicsConfig(topic)} />
       </div>
       <h1>{topic}</h1>
     </div>

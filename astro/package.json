@@ -14,7 +14,6 @@
   },
   "devDependencies": {
     "sitemap": "^8.0.0",
-    "@astrojs/sitemap": "^3.2.1",
     "@fontsource/noto-sans": "^5.1.1",
     "@twemoji/api": "^15.1.0",
     "@types/cheerio": "^0.22.35",

@@ -1,4 +1,5 @@
 ---
+import { topicsConfig } from "../lib/topics";
 import Emoji from "./Emoji.astro";
 
 interface Props {
@@ -13,7 +14,7 @@ const { topics } = Astro.props;
     topics.map((topic) => (
       <a href={`/topics/${topic}`} class="topic">
         <div class="topic-icon">
-          <Emoji emoji="#⃣" />
+          <Emoji emoji={topicsConfig(topic)} />
         </div>
         <p class="topic-item">{topic}</p>
       </a>

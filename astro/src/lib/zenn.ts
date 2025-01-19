@@ -110,14 +110,19 @@ const timeSort = (a: Date | undefined, b: Date | undefined) => {
 const headingsNormalize = (headings: MarkdownHeading[]) => {
   if (headings.length === 0) {
     return [];
+  } else if (headings.length === 1) {
+    return [{ ...headings[0], level: 1 }];
   } else {
     const [top, ...rest] = headings;
     const minDepth = Math.min(...rest.map((heading) => heading.depth));
+    console.log(minDepth, top.depth);
     const restLevel = (() => {
       if (top.depth == minDepth) {
-        return rest.map((heading) => ({ ...heading, level: heading.depth + 1 }));
+        return rest.map((heading) => ({ ...heading, level: heading.depth - top.depth + 1 }));
       } else if (top.depth < minDepth) {
-        return rest.map((heading) => ({ ...heading, level: heading.depth }));
+        const a = rest.map((heading) => ({ ...heading, level: heading.depth - top.depth }));
+        console.log(a);
+        return a;
       } else {
         throw new Error("Invalid heading depth");
       }

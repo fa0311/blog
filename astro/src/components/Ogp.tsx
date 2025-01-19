@@ -48,7 +48,7 @@ export default (title: string) => {
               fontWeight: "bold",
             }}
           >
-            @fa0311
+            {import.meta.env.AUTHOR_NAME}
           </p>
 
           <p
@@ -58,7 +58,7 @@ export default (title: string) => {
               fontWeight: "bold",
             }}
           >
-            🎇Faaa
+            {`${import.meta.env.SITE_ICON}${import.meta.env.SITE_NAME}`}
           </p>
         </div>
       </div>

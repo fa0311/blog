@@ -23,7 +23,7 @@ const { title, description, keywords, ogp, robots, canonical } = Astro.props;
     {description && <meta name="description" content={description} />}
     <meta name="keywords" content={keywords.join(",")} />
     <meta property="og:type" content={ogp ? "article" : "website"} />
-    <meta property="og:site_name" content="Faaa" />
+    <meta property="og:site_name" content={import.meta.env.SITE_NAME} />
     <meta property="twitter:card" content={ogp ? "summary_large_image" : "summary"} />
     <meta property="og:url" content={Astro.url} />
 
@@ -43,9 +43,9 @@ const { title, description, keywords, ogp, robots, canonical } = Astro.props;
           <a href="/">
             <div class="site-logo">
               <div class="site-icon">
-                <Emoji emoji="🎇" />
+                <Emoji emoji={import.meta.env.SITE_ICON} />
               </div>
-              <p class="site-name">Faaa</p>
+              <p class="site-name">{import.meta.env.SITE_NAME}</p>
             </div>
           </a>
         </nav>
@@ -55,7 +55,7 @@ const { title, description, keywords, ogp, robots, canonical } = Astro.props;
 
     <footer>
       <div class="site-footer">
-        <p>© 114514</p>
+        <p>{`© ${new Date().getFullYear()} ${new URL(Astro.url).hostname}`}</p>
       </div>
     </footer>
   </body>
