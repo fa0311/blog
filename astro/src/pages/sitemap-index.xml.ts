@@ -5,6 +5,7 @@ import { getArticleData, getTopics, pageSplit } from "../lib/zenn";
 export const GET: APIRoute = async ({ url }) => {
   const sitemap = new SitemapStream({ hostname: url.origin });
   const articles = await getArticleData();
+  const topics = await getTopics();
   sitemap.write({ url: "/", changefreq: "daily", priority: 1 });
 
   articles.forEach((article) => {
@@ -15,13 +16,12 @@ export const GET: APIRoute = async ({ url }) => {
     sitemap.write({ url: `/${index}`, changefreq: "monthly", priority: 0.5 });
   });
 
-  getTopics(articles).forEach((topic) => {
+  topics.forEach((topic) => {
     sitemap.write({ url: `/topics/${topic}`, changefreq: "monthly", priority: 0.5 });
     const data = articles.filter((article) => {
-      const articleTopics = article.frontmatter.topics;
-      return articleTopics.includes(topic) || article.frontmatter.type === topic;
+      return article.topics.some((t) => t.name === topic.name);
     });
-    pageSplit(articles).forEach(({ index }) => {
+    pageSplit(data).forEach(({ index }) => {
       sitemap.write({ url: `/topics/${topic}/${index}`, changefreq: "monthly", priority: 0.5 });
     });
   });

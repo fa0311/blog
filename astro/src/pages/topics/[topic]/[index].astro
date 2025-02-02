@@ -1,23 +1,23 @@
 ---
 import "zenn-content-css";
 import Articles from "../../../components/Articles.astro";
-import Emoji from "../../../components/Emoji.astro";
+import Icon from "../../../components/Icon.astro";
 import Pagination from "../../../components/Pagination.astro";
 import Layout from "../../../layouts/Layout.astro";
-import { topicsConfig } from "../../../lib/topics";
+import { astroURL } from "../../../lib/url";
 import { getArticleData, getTopics, pageSplit } from "../../../lib/zenn";
 
 export const getStaticPaths = async () => {
   const articles = await getArticleData();
-  return getTopics(articles).flatMap((topic) => {
+  const topics = await getTopics();
+  return topics.flatMap((topic) => {
     const data = articles.filter((article) => {
-      const articleTopics = article.frontmatter.topics;
-      return articleTopics.includes(topic) || article.frontmatter.type === topic;
+      return article.topics.map((topic) => topic.name).includes(topic.name);
     });
 
     return pageSplit(data).map(({ data, index, length }) => {
       return {
-        params: { index: index, topic: topic },
+        params: { index: index, topic: topic.name },
         props: {
           topic: topic,
           index: index,
@@ -39,17 +39,17 @@ const { topic, data, length, index } = Astro.props;
 ---
 
 <Layout
-  title={topic}
-  description={`${topic}の記事一覧`}
-  keywords={[topic]}
-  canonical={index === 1 ? new URL(".", Astro.url) : Astro.url}
+  title={topic.displayName}
+  description={`${topic.displayName}の記事一覧`}
+  keywords={[topic.displayName, "記事一覧"]}
+  url={index === 1 ? astroURL(Astro).dir("..") : undefined}
 >
   <header>
     <div class="header-content">
       <div class="header-emoji">
-        <Emoji emoji={topicsConfig(topic)} />
+        <Icon topic={topic} />
       </div>
-      <h1>{topic}</h1>
+      <h1>{topic.displayName}</h1>
     </div>
   </header>
   <main>
@@ -98,6 +98,12 @@ const { topic, data, length, index } = Astro.props;
       max-width: 960px;
       padding: 0 40px;
       margin: 0 auto;
+    }
+
+    @media (max-width: 576px) {
+      main {
+        padding: 0 20px;
+      }
     }
   </style>
 </Layout>
