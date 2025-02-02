@@ -1,0 +1,4 @@
+---
+import { astroURL } from "./../../src/lib/url.ts";
+return Astro.rewrite(astroURL(Astro).file("/1").pathname);
+---

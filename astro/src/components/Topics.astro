@@ -1,0 +1,56 @@
+---
+import { astroURL } from "../lib/url";
+import { type Topic } from "../lib/zenn";
+import Icon from "./Icon.astro";
+
+interface Props {
+  topics: Topic[];
+}
+
+const { topics } = Astro.props;
+---
+
+<div class="topics">
+  {
+    topics.map((topic) => (
+      <a href={`${astroURL(Astro).dir(`/topics/${topic.name}`)}`} class="topic">
+        <div class="topic-icon">
+          <Icon topic={topic} />
+        </div>
+        <p class="topic-item">{topic.displayName}</p>
+      </a>
+    ))
+  }
+</div>
+<style>
+  .topics {
+    display: flex;
+    padding: 0 0 10px 0;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .topic {
+    display: flex;
+    padding: 3px;
+    border-radius: 20px;
+    border: 1px solid #e4edf4;
+  }
+
+  .topic:hover {
+    background: #f5f9fc;
+  }
+
+  .topic-item {
+    margin: auto 7px;
+    font-size: 0.8rem;
+    text-wrap: nowrap;
+  }
+
+  .topic-icon {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+</style>

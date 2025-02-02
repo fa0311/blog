@@ -1,0 +1,264 @@
+---
+import "zenn-content-css";
+import Articles from "../../../components/Articles.astro";
+import Emoji from "../../../components/Emoji.astro";
+import Github from "../../../components/icon/Github.astro";
+import Navigation from "../../../components/Navigation.astro";
+import Topics from "../../../components/Topics.astro";
+import Zenn from "../../../components/Zenn.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { getRemoteUrl } from "../../../lib/git";
+import { astroURL } from "../../../lib/url";
+import { getArticleData, getZennUrl, markdownToHtmlNormalized } from "../../../lib/zenn";
+
+export const getStaticPaths = async () => {
+  const articles = await getArticleData();
+  const remote = await (async () => {
+    const url = await getRemoteUrl();
+    return url.endsWith(".git") ? url.slice(0, ".git".length * -1) : url;
+  })();
+
+  return articles.map((article) => {
+    const relatedArticles = article.getRelatedArticles().slice(0, 6);
+    const lastCommit = article.lastCommit ?? new Date();
+    const lastCommitDate = (() => {
+      const y = lastCommit.getFullYear().toString();
+      const m = (lastCommit.getMonth() + 1).toString().padStart(2, "0");
+      const d = lastCommit.getDate().toString().padStart(2, "0");
+      return `${y}/${m}/${d}`;
+    })();
+
+    const content = article.getContent();
+    if (article.frontmatter.published) {
+      const md = [":::message", `この記事は <${getZennUrl(article.slug)}> の複製です。`, ":::"];
+      const note = markdownToHtmlNormalized(md.join("\n"));
+      content.prepend(note.contents());
+    }
+    const html = content.contents();
+    const nav = content.headings().filter((heading) => heading.level <= 2);
+
+    const description = (() => {
+      const text = content.description();
+      return text.length > 120 ? `${text.slice(0, 117)}...` : text;
+    })();
+
+    return {
+      params: { id: article.slug },
+      props: {
+        slug: article.slug,
+        html: html,
+        description: description,
+        title: article.frontmatter.title,
+        emoji: article.frontmatter.emoji,
+        topics: article.topics,
+        published: article.frontmatter.published,
+        lastCommit: lastCommitDate,
+        edit: `${remote}/blob/main/articles/${article.slug}.md`,
+        nav: nav.map((heading) => ({
+          title: heading.text,
+          slug: heading.slug,
+          level: heading.level,
+        })),
+        relatedArticles: relatedArticles.map((article) => ({
+          title: article.frontmatter.title,
+          emoji: article.frontmatter.emoji,
+          slug: article.slug,
+        })),
+      },
+    };
+  });
+};
+const { relatedArticles, lastCommit, html, title, emoji, topics, nav, description, published, slug, edit } =
+  Astro.props;
+---
+
+<Layout
+  title={title}
+  description={description}
+  keywords={topics.map((topic) => topic.displayName)}
+  ogp={astroURL(Astro).file("ogp.png")}
+  canonical={published ? getZennUrl(slug) : undefined}
+>
+  <header class="header-content">
+    <div class="header-emoji">
+      <Emoji emoji={emoji} />
+    </div>
+    <div class="title-content">
+      <h1>{title}</h1>
+    </div>
+    <div class="title-content">
+      <p class="title-date">{lastCommit}に更新</p>
+    </div>
+  </header>
+  <main>
+    <article>
+      <div class="content-main">
+        <div class="topics">
+          <Topics topics={topics} />
+        </div>
+        <Zenn html={html} />
+        <a href={edit} target="_blank">
+          <div class="edit-github">
+            <div class="github-icon">
+              <Github />
+            </div>
+            <p class="edit-github-text">GitHubで編集を提案</p>
+          </div>
+        </a>
+      </div>
+
+      <aside>
+        <div class="content-nav">
+          <h2 class="nav-title">目次</h2>
+          <Navigation data={nav} type="original" />
+        </div>
+      </aside>
+    </article>
+  </main>
+  <section class="related-articles-content">
+    <h2>Read next</h2>
+    <Articles type="list" data={relatedArticles} />
+  </section>
+
+  <style>
+    h1 {
+      font-size: 24px;
+      margin: 24px 0px 0px;
+      white-space: pre-wrap;
+    }
+
+    .header-emoji {
+      width: 75px;
+      height: 75px;
+      margin: 0 auto;
+    }
+    .topics {
+      margin: 10px 0;
+    }
+
+    .header-content {
+      padding: 60px;
+      margin: 0 auto;
+      max-width: 840px;
+    }
+
+    main {
+      max-width: 1200px;
+      padding: 0 40px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 576px) {
+      main {
+        padding: 0px;
+      }
+    }
+
+    article {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 30px;
+    }
+    @media (max-width: 920px) {
+      article {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        display: none;
+      }
+    }
+
+    .title-content {
+      display: flex;
+      justify-content: center;
+    }
+
+    .title-date {
+      color: #535e67;
+    }
+
+    .nav-title {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .content-main {
+      max-width: 830px;
+      padding: 20px 40px 40px 40px;
+      margin: 0 0 40px 0;
+      background-color: #fff;
+      border-radius: 4px;
+      border: 1px solid #e4edf4;
+      overflow: hidden;
+    }
+
+    @media (max-width: 576px) {
+      .content-main {
+        padding: 20px 20px 40px 20px;
+      }
+    }
+
+    .related-articles-content {
+      margin: 0 auto;
+      padding: 0 40px;
+      max-width: 960px;
+    }
+
+    @media (max-width: 576px) {
+      .related-articles-content {
+        padding: 0 20px;
+      }
+    }
+
+    .related-articles-content h2 {
+      font-size: 1.7rem;
+      font-weight: bold;
+    }
+
+    .content-nav {
+      position: sticky;
+      top: 30px;
+      padding: 20px 20px 25px;
+      background-color: #ffffff;
+      border-radius: 4px;
+      border: 1px solid #e4edf4;
+      margin: 0 0 40px 0;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+
+    section {
+      margin: 0 0 40px 0;
+    }
+
+    .edit-github {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 20px;
+      gap: 5px;
+      padding: 7px 14px;
+      border: 1px solid #d6e3ed;
+      border-radius: 99rem;
+    }
+
+    .edit-github-text {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    .edit-github:hover {
+      background: #f5fbff;
+      border-color: #d6e3ed;
+    }
+
+    a:focus .edit-github {
+      border: 1px solid #3ea8ff;
+      box-shadow: 0 0 0 2.5px #bfdcff;
+    }
+
+    .github-icon {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+</Layout>

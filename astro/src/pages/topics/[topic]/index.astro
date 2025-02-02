@@ -1,0 +1,17 @@
+---
+import { astroURL } from "../../../lib/url";
+import { getTopics } from "../../../lib/zenn";
+
+export const getStaticPaths = async () => {
+  const topics = await getTopics();
+  return topics.map((topic) => {
+    return {
+      params: { topic: topic.name },
+    };
+  });
+};
+
+const { topic } = Astro.params;
+
+return Astro.rewrite(astroURL(Astro).file(`/topics/${topic}/1`));
+---
