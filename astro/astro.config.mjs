@@ -5,4 +5,5 @@ export default defineConfig({
   output: "static",
   trailingSlash: "never",
   site: "https://articles.yuki0311.com",
+  base: "/",
 });

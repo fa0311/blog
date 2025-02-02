@@ -1,3 +1,5 @@
+import SiteIcon from "./SiteIcon";
+
 export default (title: string) => {
   return (
     <div
@@ -50,16 +52,35 @@ export default (title: string) => {
           >
             {import.meta.env.SITE_AUTHOR_NAME}
           </p>
-
-          <p
+          <div
             style={{
-              fontSize: "60px",
-              color: "#333",
-              fontWeight: "bold",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
-            {`${import.meta.env.SITE_ICON}${import.meta.env.SITE_NAME}`}
-          </p>
+            <div
+              style={{
+                display: "flex",
+                width: "70px",
+                height: "70px",
+                marginRight: "10px",
+                borderRadius: import.meta.env.SITE_ICON_RADIUS,
+                overflow: "hidden",
+              }}
+            >
+              {SiteIcon({ text: import.meta.env.SITE_ICON })}
+            </div>
+            <p
+              style={{
+                fontSize: "60px",
+                color: "#333",
+                fontWeight: "bold",
+              }}
+            >
+              {import.meta.env.SITE_NAME}
+            </p>
+          </div>
         </div>
       </div>
     </div>

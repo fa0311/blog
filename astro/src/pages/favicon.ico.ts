@@ -5,8 +5,8 @@ import Favicon from "../components/tsx/Favicon";
 
 export const GET: APIRoute = async () => {
   const body = new ImageResponse(Favicon(import.meta.env.SITE_ICON), {
-    width: 16,
-    height: 16,
+    width: 64,
+    height: 64,
   });
   return new Response(await body.arrayBuffer(), {
     headers: {
