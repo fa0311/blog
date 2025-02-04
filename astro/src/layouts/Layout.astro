@@ -17,7 +17,7 @@ import Feed from "../components/icon/Feed.astro";
 import Github from "../components/icon/Github.astro";
 import Twitter from "../components/icon/Twitter.astro";
 import SiteIcon from "../components/SiteIcon.astro";
-import { astroURL, getGitHubUrl, getTwitterUrl, getZennUrl } from "../lib/url";
+import { astroURL, getZennUrl } from "../lib/url";
 
 const { title, description, type, keywords, ogp, robots, canonical, url, modifiedDate, publishedDate } = Astro.props;
 
@@ -27,13 +27,20 @@ const schema = {
   name: import.meta.env.SITE_NAME,
   headline: title,
   description: description,
-  keywords: keywords,
+  keywords: keywords.join(","),
   url: url ?? astroURL(Astro).url,
-  image: ogp ? ogp.href : astroURL(Astro).file("/ogp.png"),
+  image: {
+    "@type": "ImageObject",
+    name: title,
+    url: ogp?.href ?? astroURL(Astro).file("/ogp.png"),
+    width: ogp ? 1200 : 400,
+    height: ogp ? 630 : 400,
+  },
   author: {
     "@type": "Person",
     name: import.meta.env.SITE_AUTHOR_NAME,
     url: astroURL(Astro).dir("/"),
+    sameAs: getZennUrl(),
   },
   datePublished: publishedDate ?? modifiedDate ?? undefined,
   dateModified: modifiedDate ?? publishedDate ?? undefined,
@@ -41,7 +48,7 @@ const schema = {
     "@type": "WebPage",
     "@id": url ?? astroURL(Astro).url,
   },
-  sameAs: [getZennUrl(), getTwitterUrl(), getGitHubUrl()].filter((url) => url !== undefined),
+  sameAs: canonical,
 };
 ---
 
@@ -50,19 +57,28 @@ const schema = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href={`${astroURL(Astro).file("/favicon.ico")}`} />
+    <link rel="icon" type="image/png" href={astroURL(Astro).file("/favicon.png")} />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <meta name="keywords" content={keywords.join(",")} />
-    <meta property="og:type" content={ogp ? "article" : "website"} />
-    <meta property="og:site_name" content={import.meta.env.SITE_NAME} />
     <meta property="twitter:card" content={ogp ? "summary_large_image" : "summary"} />
     <meta property="twitter:site" content={import.meta.env.TWITTER_USER_NAME} />
+    <meta property="og:type" content={ogp ? "article" : "website"} />
+    <meta property="og:site_name" content={import.meta.env.SITE_NAME} />
     <meta property="og:url" content={url ?? astroURL(Astro).url} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:locale" content="ja_JP" />
-    <meta property="og:image" content={ogp ? ogp.href : astroURL(Astro).file("/ogp.png")} />
+    <meta property="og:image" content={ogp?.href ?? astroURL(Astro).file("/ogp.png")} />
+    <meta property="og:image:width" content={ogp ? "1200" : "400"} />
+    <meta property="og:image:height" content={ogp ? "630" : "400"} />
+    {ogp && modifiedDate && <meta property="og:updated_time" content={modifiedDate.toISOString()} />}
+    <meta property="og:image:alt" content={title} />
+    <meta property="article:author" content={import.meta.env.SITE_AUTHOR_NAME} />
+    <meta property="article:section" content="Technology" />
+    <meta property="article:tag" content={keywords.join(",")} />
+    {publishedDate && <meta property="article:published_time" content={publishedDate.toISOString()} />}
+    {modifiedDate && <meta property="article:modified_time" content={modifiedDate.toISOString()} />}
     {robots && <meta name="robots" content={robots} />}
     <link rel="canonical" href={canonical ?? url ?? astroURL(Astro).url} />
     <link rel="sitemap" type="application/xml" href=`${ astroURL(Astro).file("/sitemap-index.xml")}` />
