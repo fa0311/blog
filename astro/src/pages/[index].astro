@@ -10,7 +10,7 @@ export const getStaticPaths = async () => {
   const data = await getArticleData();
   return pageSplit(data).map(({ data, index, length }) => {
     return {
-      params: { index: index },
+      params: { index: String(index) },
       props: {
         index: index,
         length: length,

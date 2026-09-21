@@ -3,12 +3,13 @@ import imagemin from "imagemin";
 import imageminWebp from "imagemin-webp";
 import { promises as fs } from "node:fs";
 import Path, { sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { cache, getCached } from "../../../lib/cache";
 import { convertExt, pathSplit } from "../../../lib/path";
 
 export const GET: APIRoute = async ({ params, props }) => {
-  const path = new URL(`../../../../../images/${params.slug}`, import.meta.url);
-  const [baseDir] = pathSplit(path.pathname);
+  const path = Path.resolve("../images", params.slug!);
+  const baseDir = Path.dirname(path).replaceAll(sep, "/");
   const [dir, name, ext] = pathSplit(params.slug!);
   try {
     const body = await fs.readFile(path);
@@ -21,7 +22,7 @@ export const GET: APIRoute = async ({ params, props }) => {
     const cacheDir = await getCached(`images/${dir}`);
     const convertedImagePath = await cache(`webp/${dir}/${name}`, async () => {
       const files = await imagemin([`${baseDir}/${name}.*`], {
-        destination: cacheDir.pathname,
+        destination: fileURLToPath(cacheDir),
         plugins: [imageminWebp({ quality: 50 })],
       });
       return files[0].destinationPath;

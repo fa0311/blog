@@ -46,8 +46,9 @@ const getArticleList = async (): Promise<ArticleListResponse[]> => {
   const icons = await getTopicsMetadata();
   const enable = raw.filter((article) => article.contents.frontmatter.static === true);
   const article = enable.map(async (article) => {
-    const lastCommit = await getLatestCommitTime(Path.relative("../../", article.file));
-    const firstCommit = await getFirstCommitTime(Path.relative("../../", article.file));
+    const path = Path.join("..", "articles", Path.basename(article.file));
+    const lastCommit = await getLatestCommitTime(path);
+    const firstCommit = await getFirstCommitTime(path);
     const top = [...article.contents.frontmatter.topics, article.contents.frontmatter.type];
     const topics = await Promise.all(top.map(async (name) => await icons(name)));
     return { ...article, lastCommit, firstCommit, topics };
