@@ -1,2 +1,6 @@
 packages:
   - "astro"
+allowBuilds:
+  cwebp-bin: true
+  esbuild: true
+  sharp: true
