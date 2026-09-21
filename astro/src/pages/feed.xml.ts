@@ -10,15 +10,15 @@ export const GET: APIRoute = async ({ url }) => {
     description: import.meta.env.SITE_DESCRIPTION,
     site: astroURL({ url }).dir("/"),
     trailingSlash: astroURL({ url }).slash,
-    items: data
-      .map((article) => ({
+    items: await Promise.all(
+      data.slice(0, 10).map(async (article) => ({
         link: astroURL({ url }).dir(`/articles/${article.slug}`).href,
         title: article.frontmatter.title,
-        description: article.getContent().description(),
+        description: (await article.getContent()).description(),
         pubDate: article.firstCommit,
         categories: article.topics.map((topic) => topic.name),
         trailingSlash: astroURL({ url }).slash,
-      }))
-      .slice(0, 10),
+      })),
+    ),
   });
 };

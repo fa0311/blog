@@ -167,9 +167,9 @@ const calculateSimilarity = (a: string[], b: string[]) => {
   return intersection.length / union.length;
 };
 
-export const markdownToHtmlNormalized = (raw: string) => {
+export const markdownToHtmlNormalized = async (raw: string) => {
   const embedOrigin = "https://embed.zenn.studio";
-  const html = markdownToHtml(raw, { embedOrigin });
+  const html = await markdownToHtml(raw, { embedOrigin });
   const $ = cheerio.load(html);
 
   $(`img`).each((i, el) => {
@@ -179,7 +179,7 @@ export const markdownToHtmlNormalized = (raw: string) => {
   const headings = Array.from($("h1, h2, h3, h4, h5, h6")).map((el) => {
     const $el = $(el);
     return {
-      depth: parseInt($el.prop("tagName").slice(1)),
+      depth: parseInt($el.prop("tagName")!.slice(1)),
       slug: $el.attr("id")!,
       text: $el.text(),
     };

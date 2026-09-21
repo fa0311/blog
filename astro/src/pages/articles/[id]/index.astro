@@ -25,9 +25,9 @@ export const getStaticPaths = async () => {
     return url.endsWith(".git") ? url.slice(0, ".git".length * -1) : url;
   })();
 
-  return articles.map((article) => {
+  return Promise.all(articles.map(async (article) => {
     const relatedArticles = article.getRelatedArticles().slice(0, 6);
-    const content = article.getContent();
+    const content = await article.getContent();
     const description = (() => {
       const text = content.description();
       return text.length > 120 ? `${text.slice(0, 117)}...` : text;
@@ -35,7 +35,7 @@ export const getStaticPaths = async () => {
 
     if (article.frontmatter.published) {
       const md = [":::message", `この記事は <${getZennArticleUrl(article.slug)}> の複製です。`, ":::"];
-      const note = markdownToHtmlNormalized(md.join("\n"));
+      const note = await markdownToHtmlNormalized(md.join("\n"));
       content.prepend(note.contents());
     }
     const html = content.contents();
@@ -66,7 +66,7 @@ export const getStaticPaths = async () => {
         })),
       },
     };
-  });
+  }));
 };
 const {
   relatedArticles,
